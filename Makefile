@@ -6,8 +6,14 @@ build: clean
 	cc -c main.c ${CFLAGS} -Wall
 	# CLI
 	cc -c cli.c ${CFLAGS} -Wall
+	# CLI
+	cc -c gph.c ${CFLAGS} -Wall
 	# Link HTML CGI (static)
 	cc -o main xml.o youtube.o main.o \
+		${LDFLAGS} \
+		-ltls -lssl -lcrypto -static
+	# Link gph UI
+	cc -o gph xml.o youtube.o gph.o \
 		${LDFLAGS} \
 		-ltls -lssl -lcrypto -static
 	# Link CLI UI
@@ -16,4 +22,4 @@ build: clean
 		-ltls
 
 clean:
-	rm -f main cli *.o
+	rm -f main cli gph *.o

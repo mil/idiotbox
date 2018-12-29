@@ -1,3 +1,7 @@
+- youtube_search: make page an int.
+- youtube_search: make order some enum type.
+
+
 - decodeparam, getparam etc: cast ctype functions to (unsigned char).
 
 - order by views does not work in searching channel.
