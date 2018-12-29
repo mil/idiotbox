@@ -1,6 +1,8 @@
+- gph: encode search parameter (spaces).
+- gph: escape text like "|", TAB and other control-characters.
+
 - youtube_search: make page an int.
 - youtube_search: make order some enum type.
-
 
 - decodeparam, getparam etc: cast ctype functions to (unsigned char).
 
