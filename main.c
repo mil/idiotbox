@@ -382,7 +382,7 @@ render(void)
 			"<tfoot>\n"
 			"<tr>\n"
 			"\t<td align=\"left\" class=\"nowrap\" nowrap>\n");
-		if (curpage > 0) {
+		if (curpage > 1) {
 			OUT("\t\t<a href=\"?q=");
 			xmlencode(search);
 			OUT("&amp;page=");
