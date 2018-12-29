@@ -1,0 +1,16 @@
+- decodeparam, getparam etc: cast ctype functions to (unsigned char).
+
+- order by views does not work in searching channel.
+- pagination does not work in searching in channel.
+- searching in channel works, but not search in user.
+
+? some way to show duration for playlists?
+- show published date in a consistent way? ("non-human friendly": YYYY-mm-dd HH:MM:SS TZ)
+
+- separate code parsing and views for frontend.
+- frontends:
+  - CGI HTTP
+  - CGI gopher
+  - dmenu / console (TSV output?) (no HTTP client, just parsing).
+
+- test/tweak Accept-Language header.

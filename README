@@ -1,0 +1,44 @@
+Dependencies:
+-------------
+
+- C compiler.
+- LibreSSL + libtls.
+
+
+Compile
+-------
+
+- make
+- doas make install
+
+
+Install HTTP CGI
+----------------
+
+Nginx + slowcgi example:
+
+	location /idiotbox/css/.* {
+		root /home/www/domains/www.codemadness.org/htdocs/idiotbox/css;
+	}
+
+	location ~ ^/idiotbox(/|/\?.*)$ {
+		include /etc/nginx/fastcgi_params;
+		fastcgi_pass  unix:/run/slowcgi.sock;
+		fastcgi_param SCRIPT_FILENAME  /cgi-bin/idiotbox;
+		fastcgi_param SCRIPT_NAME  /cgi-bin/idiotbox;
+		fastcgi_param REQUEST_URI  /cgi-bin/idiotbox;
+        }
+
+httpd + slowcgi example:
+
+	location match "/idiotbox" {
+		root "/cgi-bin/idiotbox.cgi"
+		fastcgi
+	}
+
+
+When using a chroot make sure to copy /etc/resolv.conf and /etc/ssl/cert.pem.
+
+To test from the command-line you can do:
+
+	QUERY_STRING="q=funny+cat+video" ./main | sed 1,2d | lynx -stdin
