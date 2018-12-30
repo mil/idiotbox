@@ -71,7 +71,8 @@ decodeparam(char *buf, size_t bufsiz, const char *s)
 			return -1;
 		switch (*s) {
 		case '%':
-			if (!isxdigit(*(s+1)) || !isxdigit(*(s+2)))
+			if (!isxdigit((unsigned char)*(s+1)) ||
+			    !isxdigit((unsigned char)*(s+2)))
 				return -1;
 			buf[i++] = hexdigit(*(s+1)) * 16 + hexdigit(*(s+2));
 			s += 2;
