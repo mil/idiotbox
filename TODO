@@ -1,3 +1,6 @@
+- search in channel "empty" string with sort by date doesn't show all newest
+  (compared to Atom feed).
+
 - gph: encode search parameter (spaces).
 - gph: escape text like "|", TAB and other control-characters.
 
