@@ -1,7 +1,11 @@
+- in channel searching the last item is not displayed? because the pager is not
+  there.
+
 - search in channel "empty" string with sort by date doesn't show all newest
   (compared to Atom feed).
+- search in channel pagination does not work.
 
-- gph: encode search parameter (spaces).
+- gph/cli: encode search parameter (spaces).
 - gph: escape text like "|", TAB and other control-characters.
 
 - youtube_search: make page an int.
@@ -9,14 +13,10 @@
 
 - decodeparam, getparam etc: cast ctype functions to (unsigned char).
 
-- order by views does not work in searching channel.
-- pagination does not work in searching in channel.
-- searching in channel works, but not search in user.
-
 ? some way to show duration for playlists?
-- show published date in a consistent way? ("non-human friendly": YYYY-mm-dd HH:MM:SS TZ)
+? show published date in a consistent way? ("non-human friendly": YYYY-mm-dd HH:MM:SS TZ)
 
-- separate code parsing and views for frontend.
+- cleanup code parsing and views for frontend.
 - frontends:
   - CGI HTTP
   - CGI gopher

@@ -1,0 +1,50 @@
+body {
+	background-color: #55ffff;
+	color: #aa00aa;
+	color: #000;
+	max-width: 80ex;
+	margin: 0 auto;
+	padding: 3px;
+}
+form {
+	margin: 0;
+}
+.nowrap {
+	whitespace: no-wrap;
+}
+.a-r {
+	text-align: right;
+}
+table.videos,
+table.search,
+table.search .input,
+input.search {
+	width: 100%;
+}
+table.videos {
+	border-collapse: collapse;
+}
+table.videos tr td {
+	vertical-align: top;
+	padding: 0 3px;
+}
+td.thumb {
+	width: 120px;
+	text-align: center;
+}
+td.thumb img {
+	height: 90px;
+}
+a {
+	text-decoration: none;
+	color: #aa0000;
+	border-bottom: 1px solid #0000aa;
+}
+td.thumb a {
+	border: 0;
+}
+hr {
+	height: 1px;
+	border: 0;
+	border-bottom: 1px solid #777;
+}
