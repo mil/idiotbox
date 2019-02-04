@@ -218,7 +218,7 @@ render(void)
 		"<title>Search: \"");
 		xmlencode(search);
 		OUT("\"");
-		if (nvideos) {
+		if (nvideos && (chan[0] || user[0])) {
 			if (videos[0].channelid[0])
 				printf(" in %s", videos[0].channeltitle);
 			else if (videos[0].userid[0])
@@ -324,7 +324,7 @@ render(void)
 
 			OUT(
 				"</a></span><br/>\n"
-				"		<span class=\"channel\">");
+				"\t\t<span class=\"channel\">");
 
 			OUT("<a title=\"Search in ");
 			xmlencode(videos[i].channeltitle);
