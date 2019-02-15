@@ -358,10 +358,9 @@ render(void)
 			if (videos[i].publishedat[0]) {
 				OUT("		<span class=\"publishedat\">Published: ");
 				OUT(videos[i].publishedat);
+				OUT("</span><br/>\n");
 			}
-			OUT(
-				"</span><br/>\n"
-				"		<span class=\"stats\">");
+			OUT("		<span class=\"stats\">");
 			OUT(videos[i].viewcount);
 			OUT(
 				"</span><br/>\n"
