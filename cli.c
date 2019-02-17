@@ -49,6 +49,34 @@ die(const char *fmt, ...)
 }
 
 int
+uriencode(const char *s, char *buf, size_t bufsiz)
+{
+	static char hex[] = "0123456789ABCDEF";
+	char *d = buf, *e = buf + bufsiz;
+	unsigned char c;
+
+	if (!bufsiz)
+		return 0;
+
+	for (; *s; ++s) {
+		c = (unsigned char)*s;
+		if (d + 4 >= e)
+			return 0;
+		if (c == ' ' || c == '#' || c == '%' || c == '?' || c == '"' ||
+		    c == '&' || c == '<' || c <= 0x1f || c >= 0x7f) {
+			*d++ = '%';
+			*d++ = hex[c >> 4];
+			*d++ = hex[c & 0x0f];
+		} else {
+			*d++ = *s;
+		}
+	}
+	*d = '\0';
+
+	return 1;
+}
+
+int
 hexdigit(int c)
 {
 	if (c >= '0' && c <= '9')
@@ -203,6 +231,8 @@ usage(const char *argv0)
 int
 main(int argc, char *argv[])
 {
+	char search[1024];
+
 	if (pledge("stdio dns inet rpath unveil", NULL) == -1) {
 		fprintf(stderr, "pledge: %s\n", strerror(errno));
 		exit(1);
@@ -218,8 +248,10 @@ main(int argc, char *argv[])
 
 	if (argc < 2 || !argv[1][0])
 		usage(argv[0]);
+	if (!uriencode(argv[1], search, sizeof(search)))
+		usage(argv[0]);
 
-	videos = youtube_search(&nvideos, argv[1], "", "", "", "relevance");
+	videos = youtube_search(&nvideos, search, "", "", "", "relevance");
 	if (!videos || nvideos <= 0) {
 		OUT("No videos found\n");
 		exit(1);

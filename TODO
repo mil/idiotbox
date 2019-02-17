@@ -5,11 +5,9 @@
 - search in channel "empty" string with sort by date doesn't show all newest
   (compared to Atom feed).
 - search in channel pagination does not work.
-- gph/cli: encode search parameter (spaces).
 - gph: escape text like "|", TAB and other control-characters.
 - youtube_search: make page an int.
 - youtube_search: make order some enum type.
-- decodeparam, getparam etc: cast ctype functions to (unsigned char).
 - cleanup code parsing and views for frontend.
 - frontends:
   - CGI HTTP
