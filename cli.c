@@ -21,11 +21,20 @@
 #define TLS_CA_CERT_FILE "/etc/ssl/cert.pem"
 #endif
 
-/* TODO: escape control-characters etc */
 #define OUT(s) (fputs((s), stdout))
+#define OUTESCAPE(s) (printescape(s))
 
 struct video *videos;
 static int nvideos;
+
+/* print: ignore control-characters */
+void
+printescape(const char *s)
+{
+	for (; *s; ++s)
+		if (!iscntrl((unsigned char)*s))
+			fputc(*s, stdout);
+}
 
 void
 die(const char *fmt, ...)
@@ -115,25 +124,25 @@ render(void)
 		switch (videos[i].linktype) {
 		case Channel:
 			OUT("[Channel] ");
-			OUT(videos[i].channeltitle);
+			OUTESCAPE(videos[i].channeltitle);
 			break;
 		case Movie:
 			OUT("[Movie] ");
-			OUT(videos[i].title);
+			OUTESCAPE(videos[i].title);
 			break;
 		case Playlist:
 			OUT("[Playlist] ");
-			OUT(videos[i].title);
+			OUTESCAPE(videos[i].title);
 			break;
 		default:
-			OUT(videos[i].title);
+			OUTESCAPE(videos[i].title);
 			break;
 		}
 		OUT("\n");
 
 		if (videos[i].id[0]) {
 			OUT("URL:           https://www.youtube.com/embed/");
-                        OUT(videos[i].id);
+                        OUTESCAPE(videos[i].id);
 			OUT("\n");
 		}
 
@@ -141,41 +150,41 @@ render(void)
 			OUT("Atom feed:     https://www.youtube.com/feeds/videos.xml?");
 			if (videos[i].channelid[0]) {
 				OUT("channel_id=");
-				OUT(videos[i].channelid);
+				OUTESCAPE(videos[i].channelid);
 			} else if (videos[i].userid[0]) {
 				OUT("user=");
-				OUT(videos[i].userid);
+				OUTESCAPE(videos[i].userid);
 			}
 			OUT("\n");
 		}
 
 		if (videos[i].channelid[0] || videos[i].userid[0]) {
 			OUT("Channel title: ");
-			OUT(videos[i].channeltitle);
+			OUTESCAPE(videos[i].channeltitle);
 			OUT("\n");
 			if (videos[i].channelid[0]) {
 				OUT("Channelid:     ");
-				OUT(videos[i].channelid);
+				OUTESCAPE(videos[i].channelid);
 				OUT("\n");
 			} else if (videos[i].userid[0]) {
 				OUT("Userid:        ");
-				OUT(videos[i].userid);
+				OUTESCAPE(videos[i].userid);
 				OUT("\n");
 			}
 		}
 		if (videos[i].publishedat[0]) {
 			OUT("Published:     ");
-			OUT(videos[i].publishedat);
+			OUTESCAPE(videos[i].publishedat);
 			OUT("\n");
 		}
 		if (videos[i].viewcount[0]) {
 			OUT("Viewcount:     ");
-			OUT(videos[i].viewcount);
+			OUTESCAPE(videos[i].viewcount);
 			OUT("\n");
 		}
 		if (videos[i].duration[0]) {
 			OUT("Duration:      " );
-			OUT(videos[i].duration);
+			OUTESCAPE(videos[i].duration);
 			OUT("\n");
 		}
 		OUT("===\n");
