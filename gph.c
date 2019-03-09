@@ -21,11 +21,23 @@
 #define TLS_CA_CERT_FILE "/etc/ssl/cert.pem"
 #endif
 
-/* TODO: escape control-characters etc */
 #define OUT(s) (fputs((s), stdout))
+#define OUTESCAPE(s) (printescape(s))
 
 struct video *videos;
 static int nvideos;
+
+/* print: ignore control-characters, escape | */
+void
+printescape(const char *s)
+{
+	for (; *s; ++s) {
+		if (*s == '|')
+			fputc('\\', stdout);
+		if (!iscntrl((unsigned char)*s))
+			fputc(*s, stdout);
+	}
+}
 
 void
 die(const char *fmt, ...)
@@ -37,6 +49,34 @@ die(const char *fmt, ...)
 	va_end(ap);
 
 	exit(1);
+}
+
+int
+uriencode(const char *s, char *buf, size_t bufsiz)
+{
+	static char hex[] = "0123456789ABCDEF";
+	char *d = buf, *e = buf + bufsiz;
+	unsigned char c;
+
+	if (!bufsiz)
+		return 0;
+
+	for (; *s; ++s) {
+		c = (unsigned char)*s;
+		if (d + 4 >= e)
+			return 0;
+		if (c == ' ' || c == '#' || c == '%' || c == '?' || c == '"' ||
+		    c == '&' || c == '<' || c <= 0x1f || c >= 0x7f) {
+			*d++ = '%';
+			*d++ = hex[c >> 4];
+			*d++ = hex[c & 0x0f];
+		} else {
+			*d++ = *s;
+		}
+	}
+	*d = '\0';
+
+	return 1;
 }
 
 int
@@ -120,24 +160,24 @@ render(void)
 		switch (videos[i].linktype) {
 		case Channel:
 			OUT("[Channel] ");
-			OUT(videos[i].channeltitle);
+			OUTESCAPE(videos[i].channeltitle);
 			break;
 		case Movie:
 			OUT("[Movie] ");
-			OUT(videos[i].title);
+			OUTESCAPE(videos[i].title);
 			break;
 		case Playlist:
 			OUT("[Playlist] ");
-			OUT(videos[i].title);
+			OUTESCAPE(videos[i].title);
 			break;
 		default:
-			OUT(videos[i].title);
+			OUTESCAPE(videos[i].title);
 			break;
 		}
 
 		if (videos[i].id[0]) {
 			OUT("|URL:https://www.youtube.com/embed/");
-			OUT(videos[i].id);
+			OUTESCAPE(videos[i].id);
 			OUT("|server|port]\n");
 		} else {
 			OUT("\n");
@@ -145,31 +185,31 @@ render(void)
 
 		if (videos[i].channelid[0] || videos[i].userid[0]) {
 			OUT("[h|Atom feed of ");
-			OUT(videos[i].channeltitle);
+			OUTESCAPE(videos[i].channeltitle);
 			OUT("|URL:https://www.youtube.com/feeds/videos.xml?");
 			if (videos[i].channelid[0]) {
 				OUT("channel_id=");
-				OUT(videos[i].channelid);
+				OUTESCAPE(videos[i].channelid);
 			} else if (videos[i].userid[0]) {
 				OUT("user=");
-				OUT(videos[i].userid);
+				OUTESCAPE(videos[i].userid);
 			}
 			OUT("|server|port]\n");
 		}
 
 		if (videos[i].publishedat[0]) {
 			OUT("Published:     ");
-			OUT(videos[i].publishedat);
+			OUTESCAPE(videos[i].publishedat);
 			OUT("\n");
 		}
 		if (videos[i].viewcount[0]) {
 			OUT("Viewcount:     ");
-			OUT(videos[i].viewcount);
+			OUTESCAPE(videos[i].viewcount);
 			OUT("\n");
 		}
 		if (videos[i].duration[0]) {
 			OUT("Duration:      " );
-			OUT(videos[i].duration);
+			OUTESCAPE(videos[i].duration);
 			OUT("\n");
 		}
 		OUT("\n\n");
@@ -188,6 +228,8 @@ usage(const char *argv0)
 int
 main(int argc, char *argv[])
 {
+	char search[1024];
+
 	if (pledge("stdio dns inet rpath unveil", NULL) == -1) {
 		fprintf(stderr, "pledge: %s\n", strerror(errno));
 		exit(1);
@@ -203,8 +245,10 @@ main(int argc, char *argv[])
 
 	if (argc < 2 || !argv[1][0])
 		usage(argv[0]);
+	if (!uriencode(argv[1], search, sizeof(search)))
+		usage(argv[0]);
 
-	videos = youtube_search(&nvideos, argv[1], "", "", "", "relevance");
+	videos = youtube_search(&nvideos, search, "", "", "", "relevance");
 	if (!videos || nvideos <= 0) {
 		OUT("tNo videos found\n");
 		exit(1);
