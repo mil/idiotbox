@@ -196,20 +196,19 @@ render(void)
 			}
 			OUT("|server|port]\n");
 		}
-
+		if (videos[i].duration[0]) {
+			OUT("Duration:      " );
+			OUTESCAPE(videos[i].duration);
+			OUT("\n");
+		}
 		if (videos[i].publishedat[0]) {
 			OUT("Published:     ");
 			OUTESCAPE(videos[i].publishedat);
 			OUT("\n");
 		}
 		if (videos[i].viewcount[0]) {
-			OUT("Viewcount:     ");
+			OUT("Views:         ");
 			OUTESCAPE(videos[i].viewcount);
-			OUT("\n");
-		}
-		if (videos[i].duration[0]) {
-			OUT("Duration:      " );
-			OUTESCAPE(videos[i].duration);
 			OUT("\n");
 		}
 		OUT("\n\n");
