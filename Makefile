@@ -1,18 +1,20 @@
+CFLAGS += -Wall
+
 build: clean
-	cc -c xml.c ${CFLAGS} -Wall
-	cc -c youtube.c ${CFLAGS} -Wall
+	cc -c xml.c ${CFLAGS}
+	cc -c youtube.c ${CFLAGS}
 	# UIs
 	# HTML
-	cc -c main.c ${CFLAGS} -Wall
+	cc -c cgi.c ${CFLAGS}
 	# CLI
-	cc -c cli.c ${CFLAGS} -Wall
+	cc -c cli.c ${CFLAGS}
 	# CLI
-	cc -c gph.c ${CFLAGS} -Wall
+	cc -c gph.c ${CFLAGS}
 	# Link HTML CGI (static)
-	cc -o main xml.o youtube.o main.o \
+	cc -o cgi xml.o youtube.o cgi.o \
 		${LDFLAGS} \
 		-ltls -lssl -lcrypto -static
-	# Link gph UI
+	# Link gph UI (static)
 	cc -o gph xml.o youtube.o gph.o \
 		${LDFLAGS} \
 		-ltls -lssl -lcrypto -static
@@ -22,4 +24,4 @@ build: clean
 		-ltls
 
 clean:
-	rm -f main cli gph *.o
+	rm -f cgi cli gph *.o
