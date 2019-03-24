@@ -145,6 +145,10 @@ parsecgi(void)
 		user[0] = '\0';
 	}
 
+	/* prefer channel over user when both are set */
+	if (chan[0] && user[0])
+		user[0] = '\0';
+
 	/* order */
 	if ((p = getparam(query, "o"))) {
 		if (decodeparam(order, sizeof(order), p) == -1 ||
@@ -264,6 +268,8 @@ render(void)
 
 	if (chan[0])
 		OUT("		<input type=\"submit\" name=\"chan\" value=\"Search all\" title=\"Search globally and not in the selected channel\" accesskey=\"c\" />\n");
+	if (user[0])
+		OUT("		<input type=\"submit\" name=\"user\" value=\"Search all\" title=\"Search globally and not in the selected user\" accesskey=\"c\" />\n");
 
 	OUT(
 		"		<select name=\"o\" title=\"Order by\" accesskey=\"o\">\n");
