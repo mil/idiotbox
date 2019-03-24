@@ -244,6 +244,11 @@ render(void)
 		xmlencode(chan);
 		OUT("\" />\n");
 	}
+	if (user[0]) {
+		OUT("<input type=\"hidden\" name=\"user\" value=\"");
+		xmlencode(user);
+		OUT("\" />\n");
+	}
 
 	OUT(
 		"<table class=\"search\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n"
@@ -378,50 +383,44 @@ render(void)
 		}
 		OUT("</tbody>\n");
 
-		OUT(
-			"<tfoot>\n"
-			"<tr>\n"
-			"\t<td align=\"left\" class=\"nowrap\" nowrap>\n");
-		if (curpage > 1) {
+		/* pagination does not work for user/channel search */
+		if (!user[0] && !chan[0]) {
+			OUT(
+				"<tfoot>\n"
+				"<tr>\n"
+				"\t<td align=\"left\" class=\"nowrap\" nowrap>\n");
+			if (curpage > 1) {
+				OUT("\t\t<a href=\"?q=");
+				xmlencode(search);
+				OUT("&amp;page=");
+				snprintf(tmp, sizeof(tmp), "%d", curpage - 1);
+				xmlencode(tmp);
+				OUT("&amp;m=");
+				xmlencode(mode);
+				OUT("&amp;o=");
+				xmlencode(order);
+				OUT("\" rel=\"prev\" accesskey=\"p\">&larr; prev</a>\n");
+			}
+			OUT(
+				"\t</td>\n\t<td></td>\n"
+				"\t<td align=\"right\" class=\"a-r nowrap\" nowrap>\n");
+
 			OUT("\t\t<a href=\"?q=");
 			xmlencode(search);
 			OUT("&amp;page=");
-			snprintf(tmp, sizeof(tmp), "%d", curpage - 1);
+			snprintf(tmp, sizeof(tmp), "%d", curpage + 1);
 			xmlencode(tmp);
 			OUT("&amp;m=");
 			xmlencode(mode);
 			OUT("&amp;o=");
 			xmlencode(order);
-			if (chan[0]) {
-				OUT("&amp;chan=");
-				xmlencode(chan);
-			}
-			OUT("\" rel=\"prev\" accesskey=\"p\">&larr; prev</a>\n");
+			OUT("\" rel=\"next\" accesskey=\"n\">next &rarr;</a>\n");
+
+			OUT(
+				"\t</td>\n"
+				"</tr>\n"
+				"</tfoot>\n");
 		}
-		OUT(
-			"\t</td>\n\t<td></td>\n"
-			"\t<td align=\"right\" class=\"a-r nowrap\" nowrap>\n");
-
-		OUT("\t\t<a href=\"?q=");
-		xmlencode(search);
-		OUT("&amp;page=");
-		snprintf(tmp, sizeof(tmp), "%d", curpage + 1);
-		xmlencode(tmp);
-		OUT("&amp;m=");
-		xmlencode(mode);
-		OUT("&amp;o=");
-		xmlencode(order);
-		if (chan[0]) {
-			OUT("&amp;chan=");
-			xmlencode(chan);
-		}
-		OUT("\" rel=\"next\" accesskey=\"n\">next &rarr;</a>\n");
-
-		OUT(
-			"\t</td>\n"
-			"</tr>\n"
-			"</tfoot>\n");
-
 		OUT("</table>\n");
 	}
 
@@ -433,15 +432,9 @@ render(void)
 int
 main(void)
 {
-	if (pledge("stdio dns inet rpath unveil", NULL) == -1) {
-		OUT("Status: 500 Internal Server Error\r\n\r\n");
-		exit(1);
-	}
-	if (unveil(TLS_CA_CERT_FILE, "r") == -1) {
-		OUT("Status: 500 Internal Server Error\r\n\r\n");
-		exit(1);
-	}
-	if (unveil(NULL, NULL) == -1) {
+	if (pledge("stdio dns inet rpath unveil", NULL) == -1 ||
+	    unveil(TLS_CA_CERT_FILE, "r") == -1 ||
+	    unveil(NULL, NULL) == -1) {
 		OUT("Status: 500 Internal Server Error\r\n\r\n");
 		exit(1);
 	}
