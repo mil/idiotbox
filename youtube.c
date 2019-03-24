@@ -498,7 +498,7 @@ getnext(void)
 }
 
 /* TODO: ? keep search state in some separate context
-   like responsedata, responsesize.
+   like responsedata, responsesize, videos.
  */
 struct video *
 youtube_search(int *nretvideos,
