@@ -12,6 +12,28 @@ Compile
 - doas make install
 
 
+Features
+--------
+
+- Doesn't use JavaScript.
+- Doesn't use (tracking) cookies.
+- CSS is optional.
+- Multiple interfaces available: CGI web, CLI, gopher (gph), this is a
+  work-in-progress.
+- Doesn't use or require the Google API.
+- CGI interface works nice in most browsers, including text-based ones.
+  On OpenBSD it runs "sandboxed" and it can be compiled as a static-linked
+  binary with pledge(2), unveil(2) in a chroot.
+
+
+Cons/caveats
+------------
+- Order by upload date is incorrect (same as on Youtube).
+- Some Youtube features are not supported.
+- Uses scraping so might break at any point.
+
+
+
 Install HTTP CGI
 ----------------
 
