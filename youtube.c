@@ -508,8 +508,6 @@ youtube_search(int *nretvideos,
 	XMLParser x = { 0 };
 	char *data, *s;
 
-	*nretvideos = -1;
-
 	if (!(data = request_search(rawsearch, chan, user, page, order)))
 		return NULL;
 	if (!(s = strstr(data, "\r\n\r\n")))
