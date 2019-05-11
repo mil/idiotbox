@@ -423,7 +423,7 @@ request(const char *path)
 	snprintf(request, sizeof(request),
 		"GET %s HTTP/1.0\r\n"
 		"Host: %s\r\n"
-		"Accept-Language: en-US\r\n" // TODO: better one.
+		"Accept-Language: en-US,en;q=0.5\r\n"
 		"Connection: close\r\n"
 		"\r\n", path, host);
 
