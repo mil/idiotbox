@@ -244,6 +244,8 @@ xmldata(XMLParser *x, const char *d, size_t dl)
 	   channel, playlist, video */
 	if ((state & Metainfo)) {
 		switch (videos[nvideos].linktype) {
+		case Playlist:
+			break; /* ignore */
 		case Channel:
 			if (metainfocount == 1)
 				strlcat(videos[nvideos].channelvideos, d, sizeof(videos[nvideos].channelvideos));
