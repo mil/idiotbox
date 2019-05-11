@@ -298,23 +298,29 @@ render(void)
 			"<tbody>\n");
 
 		for (i = 0; i < nvideos; i++) {
-			OUT(
-				"<tr class=\"v\">\n"
-				"	<td class=\"thumb\" width=\"120\" align=\"center\">\n"
-				"		<a href=\"https://www.youtube.com/embed/");
-			xmlencode(videos[i].id);
-			/* TODO: for channel show channel picture in some way? */
-			OUT("\"><img src=\"https://i.ytimg.com/vi/");
-			xmlencode(videos[i].id);
-			OUT(
-				"/default.jpg\" alt=\"\" height=\"90\" border=\"0\" /></a>\n"
-				"	</td>\n"
-				"	<td>\n"
-				"		<span class=\"title\"><a href=\"https://www.youtube.com/embed/");
-			xmlencode(videos[i].id);
-			printf("\" accesskey=\"%d\">", i);
+			OUT("<tr class=\"v\">\n"
+			"	<td class=\"thumb\" width=\"120\" align=\"center\">\n");
 
-			/* TODO: better printing of other types */
+			if (videos[i].id[0]) {
+				OUT("		<a href=\"https://www.youtube.com/embed/");
+				xmlencode(videos[i].id);
+				OUT("\"><img src=\"https://i.ytimg.com/vi/");
+				xmlencode(videos[i].id);
+				OUT("/default.jpg\" alt=\"\" height=\"90\" border=\"0\" /></a>\n");
+			} else {
+				/* placeholder image */
+				OUT("		<img src=\"https://i.ytimg.com/vi/\" alt=\"\" height=\"90\" border=\"0\" />\n");
+			}
+			OUT("	</td>\n"
+				"	<td>\n"
+				"		<span class=\"title\">");
+
+			if (videos[i].id[0]) {
+				OUT("<a href=\"https://www.youtube.com/embed/");
+				xmlencode(videos[i].id);
+				printf("\" accesskey=\"%d\">", i);
+			}
+
 			switch (videos[i].linktype) {
 			case Channel:
 				OUT("[Channel] ");
@@ -333,8 +339,11 @@ render(void)
 				break;
 			}
 
+			if (videos[i].id[0])
+				OUT("</a>");
+
 			OUT(
-				"</a></span><br/>\n"
+				"</span><br/>\n"
 				"\t\t<span class=\"channel\">");
 
 			OUT("<a title=\"Search in ");
