@@ -26,8 +26,9 @@ size_t strlcpy(char *, const char *, size_t);
 
 #define STRP(s) s,sizeof(s)-1
 
-static const int maxvideos = 30;
-static struct video videos[maxvideos + 1];
+#define MAX_VIDEOS 30
+static const int maxvideos = MAX_VIDEOS;
+static struct video videos[MAX_VIDEOS + 1];
 static int nvideos;
 
 /* temporary variables to copy for states */
