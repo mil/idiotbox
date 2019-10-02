@@ -15,6 +15,11 @@
 #include "youtube.h"
 #include "xml.h"
 
+#undef strlcat
+size_t strlcat(char *, const char *, size_t);
+#undef strlcpy
+size_t strlcpy(char *, const char *, size_t);
+
 #define READ_BUF_SIZ        16384  /* read buffer in bytes */
 #define MAX_RESPONSETIMEOUT 10     /* timeout in seconds */
 #define MAX_RESPONSESIZ     500000 /* max download size in bytes */
