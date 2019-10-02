@@ -1,3 +1,5 @@
+- improve/remove playlist links, it currently shows the first link.
+x improve playlist parsing, "view full playlist" as published column.
 - search in channel doesn't work / remember user parameter, when searching in user.
 - empty "search in" anchor tag.
 - in channel searching the last item is not displayed? because the pager is not

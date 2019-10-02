@@ -1,25 +1,25 @@
-CFLAGS += -Wall
+.POSIX:
 
 build: clean
-	cc -c xml.c ${CFLAGS}
-	cc -c youtube.c ${CFLAGS}
+	${CC} -c xml.c ${CFLAGS}
+	${CC} -c youtube.c ${CFLAGS}
 	# UIs
 	# HTML
-	cc -c cgi.c ${CFLAGS}
+	${CC} -c cgi.c ${CFLAGS}
 	# CLI
-	cc -c cli.c ${CFLAGS}
+	${CC} -c cli.c ${CFLAGS}
 	# CLI
-	cc -c gph.c ${CFLAGS}
+	${CC} -c gph.c ${CFLAGS}
 	# Link HTML CGI (static)
-	cc -o cgi xml.o youtube.o cgi.o \
+	${CC} -o cgi xml.o youtube.o cgi.o \
 		${LDFLAGS} \
 		-ltls -lssl -lcrypto -static
 	# Link gph UI (static)
-	cc -o gph xml.o youtube.o gph.o \
+	${CC} -o gph xml.o youtube.o gph.o \
 		${LDFLAGS} \
 		-ltls -lssl -lcrypto -static
 	# Link CLI UI
-	cc -o cli xml.o youtube.o cli.o \
+	${CC} -o cli xml.o youtube.o cli.o \
 		${LDFLAGS} \
 		-ltls
 
