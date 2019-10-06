@@ -218,6 +218,7 @@ render(void)
 	OUT(
 		"Content-Type: text/html; charset=utf-8\r\n\r\n"
 		"<!DOCTYPE html>\n<html>\n<head>\n"
+		"<meta name=\"referrer\" content=\"no-referrer\" />\n"
 		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
 		"<title>Search: \"");
 		xmlencode(search);
