@@ -5,7 +5,7 @@ COMPATSRC = strlcpy.c strlcat.c
 
 build: clean
 	# compat sources (strlcpy, strlcat).
-	${CC} -c ${COMPATSRC}
+	${CC} -c ${COMPATSRC} ${CFLAGS}
 	#
 	${CC} -c xml.c ${CFLAGS}
 	${CC} -c youtube.c ${CFLAGS}
