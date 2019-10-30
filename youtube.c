@@ -45,7 +45,7 @@ static const char *xml_data_buf;
 static size_t xml_data_size;
 static size_t xml_data_off;
 
-void
+static void
 setxmldata(const char *s, size_t len)
 {
 	xml_data_off = 0;
@@ -53,7 +53,7 @@ setxmldata(const char *s, size_t len)
 	xml_data_buf = s;
 }
 
-int
+static int
 getnext(void)
 {
 	if (xml_data_off >= xml_data_size)
@@ -159,7 +159,7 @@ entitytostr(const char *s)
 	return s;
 }
 
-void
+static void
 xmlattr(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
         const char *v, size_t vl)
 {
@@ -237,7 +237,7 @@ xmlattr(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
 		strlcat(userid, v, sizeof(userid));
 }
 
-void
+static void
 xmlattrentity(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
               const char *v, size_t vl)
 {
@@ -250,7 +250,7 @@ xmlattrentity(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
 	xmlattr(x, t, tl, a, al, s, strlen(s));
 }
 
-void
+static void
 xmldata(XMLParser *x, const char *d, size_t dl)
 {
 	if ((state & Pager))
@@ -283,7 +283,7 @@ xmldata(XMLParser *x, const char *d, size_t dl)
 		strlcat(videos[nvideos].channeltitle, d, sizeof(videos[nvideos].channeltitle));
 }
 
-void
+static void
 xmldataentity(XMLParser *x, const char *d, size_t dl)
 {
 	const char *s;
@@ -296,7 +296,7 @@ xmldataentity(XMLParser *x, const char *d, size_t dl)
 	xmldata(x, s, strlen(s));
 }
 
-void
+static void
 xmltagend(XMLParser *x, const char *t, size_t tl, int isshort)
 {
 	char *p;
@@ -343,14 +343,14 @@ xmltagend(XMLParser *x, const char *t, size_t tl, int isshort)
 		state &= ~Videotime;
 }
 
-void
+static void
 xmltagstart(XMLParser *x, const char *t, size_t tl)
 {
 	if ((state & Metainfo) && !strcmp(t, "li"))
 		metainfocount++;
 }
 
-char *
+static char *
 readtls(struct tls *t)
 {
 	char *buf;
@@ -381,7 +381,7 @@ readtls(struct tls *t)
 	return buf;
 }
 
-int
+static int
 edial(const char *host, const char *port)
 {
 	struct addrinfo hints, *res, *res0;
@@ -431,7 +431,7 @@ edial(const char *host, const char *port)
 	return s;
 }
 
-char *
+static char *
 request(const char *path)
 {
 	struct tls *t;
@@ -471,7 +471,7 @@ request(const char *path)
 	return data;
 }
 
-char *
+static char *
 request_search(const char *s, const char *chan, const char *user,
                const char *page, const char *order)
 {
