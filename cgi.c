@@ -31,18 +31,6 @@ static int curpage = 1;
 static char rawsearch[4096], search[4096], mode[16], order[16], page[64];
 static char chan[1024], user[1024];
 
-void
-die(const char *fmt, ...)
-{
-	va_list ap;
-
-	va_start(ap, fmt);
-	vfprintf(stderr, fmt, ap);
-	va_end(ap);
-
-	exit(1);
-}
-
 int
 hexdigit(int c)
 {

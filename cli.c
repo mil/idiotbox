@@ -33,18 +33,6 @@ printescape(const char *s)
 			fputc(*s, stdout);
 }
 
-void
-die(const char *fmt, ...)
-{
-	va_list ap;
-
-	va_start(ap, fmt);
-	vfprintf(stderr, fmt, ap);
-	va_end(ap);
-
-	exit(1);
-}
-
 int
 uriencode(const char *s, char *buf, size_t bufsiz)
 {
