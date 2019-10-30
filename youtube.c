@@ -490,7 +490,7 @@ request_search(const char *s, const char *chan, const char *user,
 			strlcat(path, "video_view_count", sizeof(path));
 	}
 
-	/* check if request is too long */
+	/* check if request is too long (truncation) */
 	if (strlen(path) >= sizeof(path) - 1)
 		return NULL;
 
