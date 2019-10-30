@@ -1,4 +1,4 @@
-struct video {
+struct item {
 	enum LinkType { Unknown = 0, Channel, Movie, Playlist, Video } linktype;
 	char id[32];
 	char title[1024];
@@ -11,7 +11,12 @@ struct video {
 	char channelvideos[32]; /* for channel */
 };
 
-struct video *
-youtube_search(int *nretvideos,
-               const char *rawsearch, const char *chan, const char *user,
+#define MAX_VIDEOS 30
+struct search_response {
+	struct item items[MAX_VIDEOS + 1];
+	size_t nitems;
+};
+
+struct search_response *
+youtube_search(const char *rawsearch, const char *chan, const char *user,
                const char *page, const char *order);

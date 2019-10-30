@@ -24,9 +24,6 @@
 #define OUT(s) (fputs((s), stdout))
 #define OUTESCAPE(s) (printescape(s))
 
-struct video *videos;
-static int nvideos;
-
 /* print: ignore control-characters */
 void
 printescape(const char *s)
@@ -138,16 +135,17 @@ getparam(const char *query, const char *s)
 }
 
 int
-render(void)
+render(struct search_response *r)
 {
-	int i;
+	struct item *videos = r->items;
+	size_t i;
 
 	if (pledge("stdio", NULL) == -1) {
 		fprintf(stderr, "pledge: %s\n", strerror(errno));
 		exit(1);
 	}
 
-	for (i = 0; i < nvideos; i++) {
+	for (i = 0; i < r->nitems; i++) {
 		/* TODO: better printing of other types */
 		switch (videos[i].linktype) {
 		case Channel:
@@ -231,6 +229,7 @@ usage(const char *argv0)
 int
 main(int argc, char *argv[])
 {
+	struct search_response *r;
 	char search[1024];
 
 	if (pledge("stdio dns inet rpath unveil", NULL) == -1) {
@@ -251,13 +250,13 @@ main(int argc, char *argv[])
 	if (!uriencode(argv[1], search, sizeof(search)))
 		usage(argv[0]);
 
-	videos = youtube_search(&nvideos, search, "", "", "", "relevance");
-	if (!videos || nvideos <= 0) {
+	r = youtube_search(search, "", "", "", "relevance");
+	if (!r || r->nitems == 0) {
 		OUT("No videos found\n");
 		exit(1);
 	}
 
-	render();
+	render(r);
 
 	return 0;
 }

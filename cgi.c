@@ -25,8 +25,7 @@
 
 extern char **environ;
 
-struct video *videos;
-static int curpage = 1, nvideos;
+static int curpage = 1;
 
 /* CGI parameters */
 static char rawsearch[4096], search[4096], mode[16], order[16], page[64];
@@ -205,10 +204,11 @@ parsecgi(void)
 }
 
 int
-render(void)
+render(struct search_response *r)
 {
+	struct item *videos = r ? r->items : NULL;
 	char tmp[64];
-	int i;
+	size_t i;
 
 	if (pledge("stdio", NULL) == -1) {
 		OUT("Status: 500 Internal Server Error\r\n\r\n");
@@ -223,7 +223,7 @@ render(void)
 		"<title>Search: \"");
 		xmlencode(search);
 		OUT("\"");
-		if (nvideos && (chan[0] || user[0])) {
+		if (r && r->nitems && (chan[0] || user[0])) {
 			if (videos[0].channelid[0])
 				printf(" in %s", videos[0].channeltitle);
 			else if (videos[0].userid[0])
@@ -292,13 +292,13 @@ render(void)
 		"</table>\n"
 		"</form>\n");
 
-	if (nvideos) {
+	if (r && r->nitems) {
 		OUT(
 			"<hr/>\n"
 			"<table class=\"videos\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n"
 			"<tbody>\n");
 
-		for (i = 0; i < nvideos; i++) {
+		for (i = 0; i < r->nitems; i++) {
 			OUT("<tr class=\"v\">\n"
 			"	<td class=\"thumb\" width=\"120\" align=\"center\">\n");
 
@@ -319,7 +319,7 @@ render(void)
 			if (videos[i].id[0]) {
 				OUT("<a href=\"https://www.youtube.com/embed/");
 				xmlencode(videos[i].id);
-				printf("\" accesskey=\"%d\">", i);
+				printf("\" accesskey=\"%zu\">", i);
 			}
 
 			switch (videos[i].linktype) {
@@ -448,6 +448,8 @@ render(void)
 int
 main(void)
 {
+	struct search_response *r = NULL;
+
 	if (pledge("stdio dns inet rpath unveil", NULL) == -1 ||
 	    unveil(TLS_CA_CERT_FILE, "r") == -1 ||
 	    unveil(NULL, NULL) == -1) {
@@ -460,14 +462,14 @@ main(void)
 	if (!rawsearch[0] && !chan[0] && !user[0])
 		goto show;
 
-	videos = youtube_search(&nvideos, rawsearch, chan, user, page, order);
-	if (!videos || nvideos <= 0) {
+	r = youtube_search(rawsearch, chan, user, page, order);
+	if (!r || r->nitems == 0) {
 		OUT("Status: 500 Internal Server Error\r\n\r\n");
 		exit(1);
 	}
 
 show:
-	render();
+	render(r);
 
 	return 0;
 }

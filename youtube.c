@@ -26,11 +26,6 @@ size_t strlcpy(char *, const char *, size_t);
 
 #define STRP(s) s,sizeof(s)-1
 
-#define MAX_VIDEOS 30
-static const int maxvideos = MAX_VIDEOS;
-static struct video videos[MAX_VIDEOS + 1];
-static int nvideos;
-
 /* temporary variables to copy for states */
 static char id[256], userid[256];
 
@@ -42,10 +37,29 @@ static enum ItemState {
 	Metainfo = 4, Title = 8, User = 16, Videotime = 32,
 } state;
 
+static struct item *videos;
+static size_t nvideos;
+
 /* data buffers, size and offset used for parsing XML, see getnext() */
-static char *responsedata;
-static size_t responsesize;
-static size_t responseoff;
+static const char *xml_data_buf;
+static size_t xml_data_size;
+static size_t xml_data_off;
+
+void
+setxmldata(const char *s, size_t len)
+{
+	xml_data_off = 0;
+	xml_data_size = len;
+	xml_data_buf = s;
+}
+
+int
+getnext(void)
+{
+	if (xml_data_off >= xml_data_size)
+		return EOF;
+	return xml_data_buf[xml_data_off++];
+}
 
 /* ? TODO: don't die in youtube.c ? */
 static void
@@ -154,7 +168,7 @@ xmlattr(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
 
 	if (!strcmp(t, "div") && !strcmp(a, "class") && isclassmatch(v, STRP("search-pager"))) {
 		/* last video */
-		if (videos[nvideos].linktype && nvideos < maxvideos) {
+		if (videos[nvideos].linktype && nvideos < MAX_VIDEOS) {
 			if (grouped != -1 && !videos[nvideos].channelid[0]) {
 				strlcpy(videos[nvideos].channelid, videos[grouped].channelid, sizeof(videos[nvideos].channelid));
 				strlcpy(videos[nvideos].channeltitle, videos[grouped].channeltitle, sizeof(videos[nvideos].channeltitle));
@@ -165,7 +179,7 @@ xmlattr(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
 		state |= Pager;
 	}
 
-	if (nvideos >= maxvideos)
+	if (nvideos >= MAX_VIDEOS)
 		return;
 
 	if (!strcmp(t, "div") && !strcmp(a, "class") &&
@@ -229,7 +243,7 @@ xmlattrentity(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
 {
 	const char *s;
 
-	if (!(state & Pager) && nvideos >= maxvideos)
+	if (!(state & Pager) && nvideos >= MAX_VIDEOS)
 		return;
 
 	s = entitytostr(v);
@@ -243,7 +257,7 @@ xmldata(XMLParser *x, const char *d, size_t dl)
 		return;
 
 	/* optimization: no need to process and must not process videos after this */
-	if (!state || nvideos >= maxvideos)
+	if (!state || nvideos >= MAX_VIDEOS)
 		return;
 
 	/* use parsed link type for meta info since this metainfo differs per type like:
@@ -275,7 +289,7 @@ xmldataentity(XMLParser *x, const char *d, size_t dl)
 	const char *s;
 
 	/* optimization: no need for entity conversion */
-	if (!state || nvideos >= maxvideos)
+	if (!state || nvideos >= MAX_VIDEOS)
 		return;
 
 	s = entitytostr(d);
@@ -292,7 +306,7 @@ xmltagend(XMLParser *x, const char *t, size_t tl, int isshort)
 	if ((state & Title) && !strcmp(t, "h3")) {
 		state &= ~Title;
 
-		if (nvideos >= maxvideos)
+		if (nvideos >= MAX_VIDEOS)
 			return;
 
 		if (!strncmp(id, "/watch", sizeof("/watch") - 1)) {
@@ -309,7 +323,7 @@ xmltagend(XMLParser *x, const char *t, size_t tl, int isshort)
 	if ((state & User)) {
 		state &= ~User;
 
-		if (nvideos >= maxvideos)
+		if (nvideos >= MAX_VIDEOS)
 			return;
 
 		/* can be user or channel */
@@ -497,22 +511,11 @@ request_search(const char *s, const char *chan, const char *user,
 	return request(path);
 }
 
-int
-getnext(void)
-{
-	if (responseoff >= responsesize)
-		return EOF;
-	return responsedata[responseoff++];
-}
-
-/* TODO: ? keep search state in some separate context
-   like responsedata, responsesize, videos.
- */
-struct video *
-youtube_search(int *nretvideos,
-               const char *rawsearch, const char *chan, const char *user,
+struct search_response *
+youtube_search(const char *rawsearch, const char *chan, const char *user,
                const char *page, const char *order)
 {
+	struct search_response *r;
 	XMLParser x = { 0 };
 	char *data, *s;
 
@@ -520,10 +523,13 @@ youtube_search(int *nretvideos,
 		return NULL;
 	if (!(s = strstr(data, "\r\n\r\n")))
 		return NULL; /* invalid response */
+	/* skip header */
 	s += strlen("\r\n\r\n");
 
-	responsedata = s;
-	responsesize = strlen(s);
+	if (!(r = calloc(1, sizeof(*r))))
+		return NULL;
+
+	setxmldata(s, strlen(s));
 
 	x.xmlattr = xmlattr;
 	x.xmlattrentity = xmlattrentity;
@@ -534,9 +540,12 @@ youtube_search(int *nretvideos,
 
 	x.getnext = getnext;
 
+	nvideos = 0;
+	videos = r->items;
+
 	xml_parse(&x);
 
-	*nretvideos = nvideos;
+	r->nitems = nvideos;
 
-	return videos;
+	return r;
 }
