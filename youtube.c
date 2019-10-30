@@ -168,7 +168,7 @@ xmlattr(XMLParser *x, const char *t, size_t tl, const char *a, size_t al,
 
 	if (!strcmp(t, "div") && !strcmp(a, "class") && isclassmatch(v, STRP("search-pager"))) {
 		/* last video */
-		if (videos[nvideos].linktype && nvideos < MAX_VIDEOS) {
+		if (nvideos < MAX_VIDEOS && videos[nvideos].linktype) {
 			if (grouped != -1 && !videos[nvideos].channelid[0]) {
 				strlcpy(videos[nvideos].channelid, videos[grouped].channelid, sizeof(videos[nvideos].channelid));
 				strlcpy(videos[nvideos].channeltitle, videos[grouped].channeltitle, sizeof(videos[nvideos].channeltitle));
